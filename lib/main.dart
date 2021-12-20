@@ -1,4 +1,7 @@
 import 'package:booksmandala/component/app_bar.dart';
+import 'package:booksmandala/component/bottom_component.dart';
+import 'package:booksmandala/component/music_control.dart';
+import 'package:booksmandala/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:booksmandala/component/slider_with_crop.dart';
 
@@ -15,15 +18,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomepage(),
@@ -31,14 +25,23 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomepage extends StatelessWidget {
+class MyHomepage extends StatefulWidget {
   const MyHomepage({Key? key}) : super(key: key);
 
+  @override
+  State<MyHomepage> createState() => _MyHomepageState();
+}
+
+class _MyHomepageState extends State<MyHomepage> {
+  num? difference = 0;
+  num? start = 0;
+  num? end = 0;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const CustomAppBar(),
           const Text(
@@ -48,8 +51,50 @@ class MyHomepage extends StatelessWidget {
           ),
           WaveSlider(
               duration: 500,
-              callbackStart: (myDouble) {},
-              callbackEnd: (myDouble) {})
+              callbackStart: (myDouble) {
+                setState(() {
+                  start = myDouble;
+                  difference = end! - start!;
+                });
+              },
+              callbackEnd: (myDouble) {
+                setState(() {
+                  end = myDouble;
+                  difference = end! - start!;
+                });
+              }),
+          Text(
+            "${difference! / 60} min in length",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+
+          /// music control buttons
+          Container(
+            margin: EdgeInsets.symmetric(
+                vertical: 20,
+                horizontal: MediaQuery.of(context).size.width * 0.15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const <Widget>[
+                CustomButtons(
+                  iconData: Icons.skip_previous_outlined,
+                  iconSize: 30,
+                  paddingSize: 19,
+                ),
+                CustomButtons(
+                  iconData: Icons.pause,
+                  iconSize: 40,
+                  paddingSize: 30,
+                ),
+                CustomButtons(
+                  iconData: Icons.check,
+                  iconSize: 30,
+                  paddingSize: 19,
+                )
+              ],
+            ),
+          ),
+          const BottomComponent(),
         ],
       ),
     ));
